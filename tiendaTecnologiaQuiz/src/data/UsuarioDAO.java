@@ -12,7 +12,7 @@ import model.Usuario;
 
 
 public class UsuarioDAO {
-    private Connection connection;
+    private static Connection connection;
 
     public UsuarioDAO(Connection connection) {
         this.connection = connection;
@@ -28,8 +28,20 @@ public class UsuarioDAO {
 
 
 
-	public boolean authenticate(String nickname, String contraseña) {
-		// TODO Auto-generated method stub
+	public static boolean authenticate(String nickname, String contraseña) {
+		String sql = "SELECT nickname,contraseña FROM Usuario WHERE nickname=? AND contraseña=?";
+		
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+			stmt.setString(1, nickname);
+			stmt.setString(2, contraseña);
+			ResultSet rs = stmt.executeQuery();
+		
+			if (rs.next()) {
+			return rs.getString("nickname").equals(nickname) && rs.getString("contraseña").equals(contraseña);
+			}
+		} catch (SQLException e) {
+		e.printStackTrace();}
+		
 		return false;
 	}
 
